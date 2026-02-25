@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 import os
+import dj_database_url
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -71,14 +72,29 @@ TEMPLATES = [
 WSGI_APPLICATION = "Cooked.wsgi.application"
 
 
-# Database
+# Database local 
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+"""
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
         "NAME": BASE_DIR / "db.sqlite3",
     }
+}
+"""
+
+# Database live.
+# Uses postgres in the cloudbut keeps using SQLite on the laptop
+# so you can still work offline
+
+DATABASES = {
+    'default': dj_database_url.config(
+        # This will use the Render database URL, 
+        # but fall back to SQLite if you're working locally
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
 
 
