@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="container mb-5">
+        <form method="GET" action="{% url 'recipe_search' %}" class="text-center">
+            <div class="d-flex flex-wrap justify-content-center gap-2">
+                {% for id, label in flavor_choices %}
+                    <input type="checkbox" name="flavor" value="{{ id }}" 
+                        class="btn-check" id="btn-{{ id }}" 
+                        {% if id in selected_flavors %}checked{% endif %}
+                        onchange="this.form.submit()">
+                    <label class="btn btn-outline-primary rounded-pill px-4" for="btn-{{ id }}">
+                        {{ label }}
+                    </label>
+                {% endfor %}
+                
+                {% if selected_flavors %}
+                    <div class="w-100 mt-2">
+                        <a href="{% url 'recipe_search' %}" class="btn btn-link text-muted btn-sm text-decoration-none">✕ Clear all filters</a>
+                    </div>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <div class="container">
+        <div class="row g-4">
+            {% for recipe in results %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card h-100 shadow-sm border-0 recipe-card">
+                        <div class="card-body p-4 text-center">
+                            <div class="text-end mb-2">
+                                <a href="{% url 'toggle_favorite' recipe.pk %}" class="text-decoration-none">
+                                    {% if user in recipe.favorites.all %}
+                                        <span style="color: #ff4d4d; font-size: 1.5rem;">❤️</span>
+                                    {% else %}
+                                        <span style="color: #ccc; font-size: 1.5rem;">🤍</span>
+                                    {% endif %}
+                                </a>
+                            </div>
+
+                            {% if recipe.reviews.count >= 2 %}
+                                <div class="mb-2">
+                                    <span class="badge bg-warning text-dark px-3 py-2 rounded-pill shadow-sm">
+                                        🔥 Popular
+                                    </span>
+                                </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2">
+                                    {{ recipe.get_flavor_profile_display }}
+                                </span>
+                            </div>
+
+                            <h4 class="card-title fw-bold mb-3">{{ recipe.title }}</h4>
+                            <p class="text-muted small">
+                                {{ recipe.instructions|truncatewords:12 }}
+                            </p>
+                        </div>
+
+                        <div class="card-footer bg-white border-0 p-4 pt-0">
+                            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-primary w-100 rounded-pill mb-2 shadow-sm">
+                                👁️ View Recipe
+                            </a>
+
+                            <a href="mailto:?subject=Check out this recipe: {{ recipe.title }}" 
+                                class="btn btn-outline-secondary w-100 rounded-pill">
+                                📩 Send Recipe
+                            </a>
+                        </div>   
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="bg-white p-5 rounded-4 shadow-sm">
+                        <h3 class="text-muted">No recipes found for these vibes.</h3>
+                        <p>Try mixing different flavors!</p>
+                        <a href="{% url 'recipe_search' %}" class="btn btn-primary rounded-pill px-4">See All Recipes</a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

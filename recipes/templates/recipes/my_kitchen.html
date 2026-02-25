@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+
+{% block title %}My Kitchen | Cooked{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm recipe-card p-4 text-center bg-white">
+                <div class="display-5 mb-2">👨‍🍳</div>
+                <h3 class="fw-bold">{{ user.username }}'s Stats</h3>
+                <hr>
+                <div class="d-flex justify-content-around">
+                    <div>
+                        <h4 class="mb-0 fw-bold">{{ cooked_count }}</h4>
+                        <small class="text-muted">Mastered</small>
+                    </div>
+                    <div>
+                        <h4 class="mb-0 fw-bold">{{ reviews.count }}</h4>
+                        <small class="text-muted">Reviews</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <h3 class="fw-bold mb-4">⭐ Favorite Recipes</h3>
+            <div class="row g-3">
+                {% for recipe in favorite_recipes %}
+                    <div class="col-sm-6">
+                        <div class="card h-100 shadow-sm border-0 recipe-card p-3">
+                            <h5 class="fw-bold mb-1">{{ recipe.title }}</h5>
+                            <span class="badge bg-primary bg-opacity-10 text-primary w-50 mb-3">
+                                {{ recipe.get_flavor_profile_display }}
+                            </span>
+                            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">Cook Again</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center py-4">
+                        <p class="text-muted">You haven't favorited any recipes yet.</p>
+                        <a href="{% url 'recipe_search' %}" class="btn btn-sm btn-primary rounded-pill">Find Inspiration</a>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <h3 class="fw-bold mt-5 mb-4">📝 My Reviews</h3>
+            <div class="list-group shadow-sm rounded-4 overflow-hidden">
+                {% for review in reviews %}
+                    <div class="list-group-item border-0 p-4 mb-2 bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-1 fw-bold">{{ review.recipe.title }}</h5>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        <p class="mb-1 text-secondary italic">"{{ review.comment }}"</p>
+                        {% if review.cooked_status %}
+                            <span class="badge bg-success rounded-pill">✅ Mastered</span>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="text-muted p-3">No reviews written yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

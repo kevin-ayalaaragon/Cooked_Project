@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}{{ recipe.title }} | Cooked{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <a href="{% url 'recipe_search' %}" class="btn btn-outline-secondary rounded-pill mb-4">
+        ← Back to Search
+    </a>
+
+    <div class="row">
+        <div class="col-md-7 mb-4">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+                <h2 class="fw-bold mb-0">{{ recipe.title }}</h2>
+                <span class="badge rounded-pill bg-primary bg-opacity-10 text-primary px-3 py-2">
+                    {{ recipe.get_flavor_profile_display }}
+                </span>
+            </div>
+            
+            <div class="card border-0 shadow-sm recipe-card p-4">
+                <h4 class="fw-bold mb-3 text-primary">Instructions</h4>
+                <p class="fs-5" style="white-space: pre-line; line-height: 1.8;">
+                    {{ recipe.instructions }}
+                </p>
+            </div>
+        </div>
+
+        <div class="col-md-5">
+            <h3 class="fw-bold mb-4">Community Reviews</h3>
+            
+            {% if user.is_authenticated %}
+                <div class="card p-4 shadow-sm border-0 recipe-card mb-4 bg-white">
+                    <h5 class="fw-bold mb-3">Leave a Review</h5>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            {{ form.as_p }}
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill">Post Review</button>
+                    </form>
+                </div>
+            {% else %}
+                <div class="alert alert-info rounded-4 border-0 shadow-sm">
+                    <a href="{% url 'login' %}" class="fw-bold">Log in</a> to share your thoughts and mark this as mastered!
+                </div>
+            {% endif %}
+
+            <div class="review-list">
+                {% for review in reviews %}
+                    <div class="bg-white p-3 rounded-4 shadow-sm mb-3 border-start border-4 {% if review.cooked_status %}border-success{% else %}border-light{% endif %}">
+                        <div class="d-flex justify-content-between">
+                            <strong class="text-primary">@{{ review.user.username }}</strong>
+                            <small class="text-muted">{{ review.created_at|date:"M d, Y" }}</small>
+                        </div>
+                        
+                        <p class="my-2 text-secondary italic">"{{ review.comment }}"</p>
+                        
+                        {% if review.cooked_status %}
+                            <span class="badge bg-success-subtle text-success rounded-pill">
+                                🍳 Mastered this!
+                            </span>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <div class="text-center py-4 bg-white rounded-4 shadow-sm">
+                        <p class="text-muted mb-0">No reviews yet. Be the first to cook this!</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
