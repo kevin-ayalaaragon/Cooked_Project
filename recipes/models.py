@@ -29,7 +29,7 @@ class Review(models.Model):
     comment = models.TextField()
     cooked_status = models.BooleanField(
         default=False, 
-        verbose_name="I cooked 👨‍🍳"  # Update this line
+        verbose_name="I made this! 👨‍🍳"
     )
     created_at = models.DateTimeField(auto_now_add=True)
     
