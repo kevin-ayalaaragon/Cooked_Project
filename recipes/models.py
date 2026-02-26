@@ -12,6 +12,8 @@ class Recipe(models.Model):
     ]
 
     title = models.CharField(max_length=200)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipes', null=True, blank=True)
+    
     flavor_profile = models.CharField(
         max_length=100,
         choices=FLAVOR_CHOICES, 
@@ -32,4 +34,18 @@ class Review(models.Model):
         verbose_name="I made this! 👨‍🍳"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+class Follow(models.Model):
+    # The person doing the following
+    follower = models.ForeignKey(User, related_name='following', on_delete=models.CASCADE)
+    # The person being followed (whose kitchen you want to see)
+    followed = models.ForeignKey(User, related_name='followers', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        # Prevents following the same person twice
+        unique_together = ('follower', 'followed')
+
+    def __str__(self):
+        return f"{self.follower} follows {self.followed}"
     

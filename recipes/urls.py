@@ -13,4 +13,6 @@ urlpatterns = [
     path('signup/', views.signup, name='signup'),
     path('community/', views.global_feed, name='global_feed'),
     path('recipe/<int:pk>/favorite/', views.toggle_favorite, name='toggle_favorite'),
+    path('kitchen/<str:username>/', views.user_kitchen, name='user_kitchen'),
+    path('follow/<str:username>/', views.toggle_follow, name='toggle_follow'),
 ]

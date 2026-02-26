@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Recipe, Review
+from django.contrib.auth.models import User
+from .models import Recipe, Review, Follow
 from .forms import ReviewForm
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q # Import this at the top!
+from django.db.models import Q 
 
 # Recipe search and where we pass in flavor profile
 
@@ -85,6 +86,22 @@ def my_kitchen(request):
         'favorite_recipes': favorite_recipes # And this
     })
 
+# User Kitchen
+def user_kitchen(request, username):
+    target_user = get_object_or_404(User, username=username)
+    recipes = Recipe.objects.filter(author=target_user)
+    
+    # Check if the logged-in user follows this kitchen owner
+    is_following = False
+    if request.user.is_authenticated:
+        is_following = Follow.objects.filter(follower=request.user, followed=target_user).exists()
+    
+    return render(request, 'recipes/kitchen.html', {
+        'kitchen_owner': target_user,
+        'recipes': recipes,
+        'is_following': is_following # Pass this to the HTML
+    })
+
 # Global Feed
 def global_feed(request):
     # Get the latest 10 reviews from everyone
@@ -103,3 +120,25 @@ def toggle_favorite(request, pk):
     else:
         recipe.favorites.add(request.user)
     return redirect(request.META.get('HTTP_REFERER', 'recipe_search'))
+
+# Follow User
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+from .models import Follow # Make sure you added the Follow model from earlier!
+
+@login_required
+def toggle_follow(request, username):
+    user_to_follow = get_object_or_404(User, username=username)
+    
+    if request.user != user_to_follow:
+        # This "gets" the connection if it exists, or "creates" it if it doesn't
+        follow_rel, created = Follow.objects.get_or_create(
+            follower=request.user, 
+            followed=user_to_follow
+        )
+        
+        # If it wasn't created, it means it already existed, so we unfollow
+        if not created:
+            follow_rel.delete()
+            
+    return redirect('user_kitchen', username=username)

@@ -16,6 +16,29 @@
                     {{ recipe.get_flavor_profile_display }}
                 </span>
             </div>
+
+            <div class="d-flex align-items-center mb-4 text-muted">
+                <span class="me-2">By <strong>@{{ recipe.author.username }}</strong></span>
+                
+                {% if user.is_authenticated and user != recipe.author %}
+                    <form action="{% url 'toggle_follow' recipe.author.username %}" method="post" class="d-inline">
+                        {% csrf_token %}
+                        {% if is_following %}
+                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                Unfollow 👤❌
+                            </button>
+                        {% else %}
+                            <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3">
+                                Follow Chef 👨‍🍳➕
+                            </button>
+                        {% endif %}
+                    </form>
+                {% endif %}
+                
+                <a href="{% url 'user_kitchen' recipe.author.username %}" class="btn btn-sm btn-link text-decoration-none ms-2">
+                    View Kitchen →
+                </a>
+            </div>
             
             <div class="card border-0 shadow-sm recipe-card p-4">
                 <h4 class="fw-bold mb-3 text-primary">Instructions</h4>
