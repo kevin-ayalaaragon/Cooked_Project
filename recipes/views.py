@@ -89,8 +89,15 @@ def my_kitchen(request):
 # User Kitchen
 def user_kitchen(request, username):
     target_user = get_object_or_404(User, username=username)
+
+    # Data for the kitchen
     recipes = Recipe.objects.filter(author=target_user)
+    favorite_recipes = target_user.favorite_recipes.all()
+    reviews = Review.objects.filter(user=target_user).order_by('-created_at')
     
+    # Calculate stats
+    cooked_count = reviews.filter(cooked_status=True).count()
+
     # Check if the logged-in user follows this kitchen owner
     is_following = False
     if request.user.is_authenticated:
@@ -99,7 +106,10 @@ def user_kitchen(request, username):
     return render(request, 'recipes/kitchen.html', {
         'kitchen_owner': target_user,
         'recipes': recipes,
-        'is_following': is_following # Pass this to the HTML
+        'favorite_recipes': favorite_recipes,
+        'reviews': reviews,
+        'cooked_count': cooked_count,
+        'is_following': is_following,
     })
 
 # Global Feed

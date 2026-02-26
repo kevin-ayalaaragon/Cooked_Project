@@ -38,7 +38,7 @@
                 <a href="{% url 'global_feed' %}" class="btn btn-sm btn-outline-light me-2">🌎 Community</a>
                 {% if user.is_authenticated %}
                     <span class="text-white me-2">Hi chef, <strong>{{ user.username }}</strong></span>
-                    <a href="{% url 'my_kitchen' %}" class="btn btn-sm btn-light me-2">🍳 My Kitchen</a>
+                    <a href="{% url 'user_kitchen' user.username %}" class="btn btn-sm btn-light me-2">🍳 My Kitchen</a>
                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
                         <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>

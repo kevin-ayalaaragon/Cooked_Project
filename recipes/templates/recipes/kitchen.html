@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}My Kitchen | Cooked{% endblock %}
+{% block title %}{{ kitchen_owner.username }}'s Kitchen | Cooked{% endblock %}
 
 {% block content %}
 <div class="container mt-4">
@@ -8,7 +8,19 @@
         <div class="col-md-4 mb-4">
             <div class="card border-0 shadow-sm recipe-card p-4 text-center bg-white">
                 <div class="display-5 mb-2">👨‍🍳</div>
-                <h3 class="fw-bold">{{ user.username }}'s Stats</h3>
+                <h3 class="fw-bold">{{ kitchen_owner.username }}'s Stats</h3>
+                
+                {% if user.is_authenticated and user != kitchen_owner %}
+                    <form action="{% url 'toggle_follow' kitchen_owner.username %}" method="post" class="mb-3">
+                        {% csrf_token %}
+                        {% if is_following %}
+                            <button type="submit" class="btn btn-outline-danger rounded-pill w-100">Unfollow 👤❌</button>
+                        {% else %}
+                            <button type="submit" class="btn btn-primary rounded-pill w-100">Follow Chef 👨‍🍳➕</button>
+                        {% endif %}
+                    </form>
+                {% endif %}
+
                 <hr>
                 <div class="d-flex justify-content-around">
                     <div>
@@ -24,6 +36,25 @@
         </div>
 
         <div class="col-md-8">
+            <h3 class="fw-bold mb-4">📖 Created Recipes</h3>
+            <div class="row g-3 mb-5">
+                {% for recipe in recipes %}
+                    <div class="col-sm-6">
+                        <div class="card h-100 shadow-sm border-0 recipe-card p-3">
+                            <h5 class="fw-bold mb-1">{{ recipe.title }}</h5>
+                            <span class="badge bg-primary bg-opacity-10 text-primary w-50 mb-3">
+                                {{ recipe.get_flavor_profile_display }}
+                            </span>
+                            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">View Recipe</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center py-4 bg-white rounded-4 shadow-sm">
+                        <p class="text-muted">This chef hasn't posted any original recipes yet.</p>
+                    </div>
+                {% endfor %}
+            </div>
+
             <h3 class="fw-bold mb-4">⭐ Favorite Recipes</h3>
             <div class="row g-3">
                 {% for recipe in favorite_recipes %}
@@ -33,19 +64,18 @@
                             <span class="badge bg-primary bg-opacity-10 text-primary w-50 mb-3">
                                 {{ recipe.get_flavor_profile_display }}
                             </span>
-                            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">Cook Again</a>
+                            <a href="{% url 'recipe_detail' recipe.pk %}" class="btn btn-sm btn-outline-primary rounded-pill">Cook This</a>
                         </div>
                     </div>
                 {% empty %}
                     <div class="col-12 text-center py-4">
-                        <p class="text-muted">You haven't favorited any recipes yet.</p>
-                        <a href="{% url 'recipe_search' %}" class="btn btn-sm btn-primary rounded-pill">Find Inspiration</a>
+                        <p class="text-muted">No favorites to show yet.</p>
                     </div>
                 {% endfor %}
             </div>
 
-            <h3 class="fw-bold mt-5 mb-4">📝 My Reviews</h3>
-            <div class="list-group shadow-sm rounded-4 overflow-hidden">
+            <h3 class="fw-bold mt-5 mb-4">📝 Recent Activity</h3>
+            <div class="list-group shadow-sm rounded-4 overflow-hidden mb-5">
                 {% for review in reviews %}
                     <div class="list-group-item border-0 p-4 mb-2 bg-white">
                         <div class="d-flex justify-content-between align-items-center">
@@ -54,7 +84,7 @@
                         </div>
                         <p class="mb-1 text-secondary italic">"{{ review.comment }}"</p>
                         {% if review.cooked_status %}
-                            <span class="badge bg-success rounded-pill">✅ Mastered</span>
+                            <span class="badge bg-success-subtle text-success rounded-pill">✅ Mastered</span>
                         {% endif %}
                     </div>
                 {% empty %}
