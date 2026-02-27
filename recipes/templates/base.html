@@ -15,10 +15,9 @@
         .recipe-card:hover { transform: translateY(-10px); box-shadow: 0 10px 25px rgba(0,0,0,0.1) !important; }
         .hero-section {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; padding: 60px 0; margin-bottom: 40px;
+            color: white; padding: 40px 0 60px 0; margin-bottom: 40px;
             border-radius: 0 0 50% 50% / 20px;
         }
-        /* Styling for the Logo Home Link */
         .logo-link {
             text-decoration: none;
             color: white;
@@ -28,37 +27,42 @@
             opacity: 0.9;
             color: white;
         }
+        /* Mobile adjustment for header buttons */
+        @media (max-width: 576px) {
+            .hero-section { padding: 30px 0 50px 0; }
+            .btn-sm { font-size: 0.75rem; padding: 0.4rem 0.7rem; }
+        }
     </style>
 </head>
 <body class="bg-light">
 
     <header class="hero-section text-center">
         <div class="container">
-            <div class="text-end mb-2">
-                <a href="{% url 'global_feed' %}" class="btn btn-sm btn-outline-light me-2">🌎 Community</a>
+            <div class="d-flex flex-wrap justify-content-center justify-content-md-end align-items-center gap-2 mb-4">
+                <a href="{% url 'global_feed' %}" class="btn btn-sm btn-outline-light rounded-pill">🌎 Community</a>
+                
                 {% if user.is_authenticated %}
-                    <span class="text-white me-2">Hi chef, <strong>{{ user.username }}</strong></span>
-                    <a href="{% url 'user_kitchen' user.username %}" class="btn btn-sm btn-light me-2">🍳 My Kitchen</a>
+                    <span class="text-white d-none d-sm-inline">Hi chef, <strong>{{ user.username }}</strong></span>
+                    <a href="{% url 'user_kitchen' user.username %}" class="btn btn-sm btn-light rounded-pill">🍳 My Kitchen</a>
                     <form action="{% url 'logout' %}" method="post" class="d-inline">
                         {% csrf_token %}
-                        <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
+                        <button type="submit" class="btn btn-sm btn-outline-light rounded-pill">Logout</button>
                     </form>
                 {% else %}
-                    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light">Login</a>
-                    <a href="{% url 'signup' %}" class="btn btn-sm btn-light ms-2">Sign Up</a>
+                    <a href="{% url 'login' %}" class="btn btn-sm btn-outline-light rounded-pill">Login</a>
+                    <a href="{% url 'signup' %}" class="btn btn-sm btn-light rounded-pill ms-1">Sign Up</a>
                 {% endif %}
             </div>
 
             <a href="{% url 'recipe_search' %}" class="logo-link">
-                <h1 class="display-4 fw-bold">🍳 Cooked</h1>
+                <h1 class="display-4 fw-bold mb-0">🍳 Cooked</h1>
             </a>
-            <p class="lead">Find your next favorite meal by vibe</p>
 
             <div class="row justify-content-center mt-4">
-                <div class="col-md-6">
+                <div class="col-11 col-md-6">
                     <form method="GET" action="{% url 'recipe_search' %}" class="input-group shadow-sm rounded-pill overflow-hidden bg-white">
                         <input type="text" name="q" class="form-control border-0 px-4 py-2" 
-                            placeholder="Search recipes or ingredients..." 
+                            placeholder="Search recipes..." 
                             value="{{ query|default:'' }}">
                         <button class="btn btn-white border-0 px-3" type="submit">
                             <span style="color: #667eea;">🔍</span>
