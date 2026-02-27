@@ -114,11 +114,20 @@ def user_kitchen(request, username):
 
 # Global Feed
 def global_feed(request):
-    # Get the latest 10 reviews from everyone
-    latest_activity = Review.objects.all().order_by('-created_at')[:10]
+    # Start with all reviews (your current 'activity' variable)
+    activity = Review.objects.all().order_by('-created_at')
     
+    tab = request.GET.get('tab')
+    
+    if tab == 'following' and request.user.is_authenticated:
+        # Get IDs of people you follow
+        following_ids = Follow.objects.filter(follower=request.user).values_list('followed_id', flat=True)
+        # Filter reviews to ONLY those people
+        activity = activity.filter(user_id__in=following_ids)
+
     return render(request, 'recipes/global_feed.html', {
-        'activity': latest_activity
+        'activity': activity,
+        'tab': tab
     })
 
 # User Favorites
